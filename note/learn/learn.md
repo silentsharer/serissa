@@ -20,5 +20,16 @@
 * page cache的作用，open的各个参数含义
 * 了解HDD、SSD盘的简单实现
 * rocksdb的基本原理以及使用
-* 磁盘分配算法的优劣
-* 裸磁盘的操作
+* 纠删码的基本原理与使用
+* 磁盘分配算法的优劣、裸磁盘的操作
+
+## 论文
+* Haystack论文，小文件padding
+* Ceph论文，创新的CRUSH算法
+* GFS论文，三驾马车之一
+
+## 开源项目
+* Ceph
+* SeaweedFS
+* Rocksdb
+* Minio
