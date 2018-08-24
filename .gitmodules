@@ -1,0 +1,3 @@
+[submodule "store/bitstore/third_party/assert"]
+	path = store/bitstore/third_party/assert
+	url = https://github.com/maonx/vimwiki-assets.git
