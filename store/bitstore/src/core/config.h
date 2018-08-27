@@ -1,12 +1,12 @@
 #ifndef BITSTORE_CORE_H
 #define BITSTORE_CORE_H
 
-#include "constants.h"
-#include "dictionary.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "constants.h"
+#include "dictionary.h"
 
 #define DEFAULT_SERVER_ADDR                 ("0.0.0.0:8080")
 #define DEFAULT_LOG_DIR                     ("/home/xiaoju/bitstore/log")
@@ -24,9 +24,15 @@ typedef struct {
 }log_t;
 
 typedef struct {
-    server_t    server;
-    log_t       log;
+    server_t server;
+    log_t    log;
 }config_t;
+
+typedef struct {
+    int      argc;
+    char     **argv;
+    config_t config;
+}bitstore_context_t;
 
 int parse_config(config_t *config, const char *file);
 void parse_server(server_t *server, dictionary *ini);
