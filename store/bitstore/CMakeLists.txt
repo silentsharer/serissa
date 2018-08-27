@@ -8,6 +8,7 @@ set(VERSION 0.0.1)
 
 # include header
 include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 
 # generate target
 add_subdirectory(src)
