@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package bitstore;
+
+// The bitstore server definition.
+service BitStore {
+    rpc Put(stream PutRequest) returns (PutResponse) {}
+    rpc Get(stream GetRequest) returns (stream GetResponse) {}
+}
+
+// put object
+message PutRequest {
+    uint64 offset = 1;
+    uint64 length = 2;
+    bytes data = 3;
+}
+
+message PutResponse {
+    sint32 errcode = 1;
+}
+
+// get object
+message GetRequest {
+    uint64 offset = 1;
+    uint64 length = 2;
+}
+
+message GetResponse {
+    sint32 errcode = 1;
+    bytes data = 2;
+}
