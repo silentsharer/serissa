@@ -68,14 +68,59 @@ int block_device_aio_open(block_device_t *block_device, const char *path)
     return BITSTORE_OK;
 }
 
-int block_device_aio_read(block_device_t *block_device)
+// data must be free by caller
+int block_device_aio_read(block_device_t *block_device, aio_context_t *aioctx,
+                          uint64_t offset, uint64_t length, void **data)
 {
+    int ret = 0;
+
+    ret = aio_context_add(aioctx, block_device->fd_direct, data);
+    if (ret != BITSTORE_OK) {
+        return ret;
+    }
+
+    aio_pread(&aioctx->aios[aioctx->num_pending], offset, length);
+    *data = aioctx->aios[aioctx->num_pending].buf;
+
+    return BITSTORE_OK;
 }
 
-int block_device_aio_write(block_device_t *block_device)
+int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
+                           uint64_t offset, uint64_t length, void *data)
 {
+    int ret = 0;
+
+    ret = aio_context_add(aioctx, block_device->fd_direct, data);
+    if (ret != BITSTORE_OK) {
+        return ret;
+    }
+
+    aio_pwrite(&aioctx->aios[aioctx->num_pending], offset, length);
+
+    return BITSTORE_OK;
 }
 
-void block_device_aio_aubmit(block_device_t *block_device, aio_context_t *aioctx)
+int block_device_aio_submit(block_device_t *block_device, aio_context_t *aioctx)
 {
+    int ret = 0;
+
+    if (aioctx->num_pending == 0) {
+        return 0;
+    }
+
+    struct iocb *iocbs[1000] = {0};
+    for (int i = 0; i < aioctx->num_pending; i++) {
+        iocbs[i] = &aioctx->aios[i].iocb;
+    }
+
+    ret = aio_queue_submit(&block_device->aio_queue, iocbs, aioctx->num_pending);
+    if (ret < 0) {
+        return ret;
+    }
+
+    if (ret < aioctx->num_pending) {
+        return BITSTORE_ERR_AIO_EIO;
+    }
+
+    return BITSTORE_OK;
 }

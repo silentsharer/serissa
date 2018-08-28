@@ -26,9 +26,11 @@ void block_device_aio_thread(void *arg);
 
 int block_device_open(block_device_t *block_device, const char *path);
 int block_device_aio_open(block_device_t *block_device, const char *path);
-int block_device_aio_read(block_device_t *block_device);
-int block_device_aio_write(block_device_t *block_device);
-void block_device_aio_aubmit(block_device_t *block_device, aio_context_t *aioctx);
+int block_device_aio_read(block_device_t *block_device, aio_context_t *aioctx,
+                          uint64_t offset, uint64_t length, void **data);
+int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
+                           uint64_t offset, uint64_t length, void *data);
+int block_device_aio_submit(block_device_t *block_device, aio_context_t *aioctx);
 
 #ifdef __cplusplus
 }
