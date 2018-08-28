@@ -11,6 +11,7 @@ int parse_config(config_t *config, const char *file)
 
     // parse section
     parse_server(&config->server, ini);
+    parse_aio(&config->aio, ini);
     parse_log(&config->log, ini);
 
     return BITSTORE_OK;
@@ -19,6 +20,12 @@ int parse_config(config_t *config, const char *file)
 void parse_server(server_t *server, dictionary *ini)
 {
     snprintf(server->addr, sizeof(server->addr), "%s", iniparser_getstring(ini, "server:addr", DEFAULT_SERVER_ADDR));
+}
+
+void parse_aio(libaio_t *aio, dictionary *ini)
+{
+    aio->max_queue_depth = iniparser_getint(ini, "aio:max_queue_depth", DEFAULT_AIO_MAX_QUEUE_DEPTH);
+    aio->timeout = iniparser_getint(ini, "aio:timeout", DEFAULT_AIO_TIMEOUT);
 }
 
 void parse_log(log_t *log, dictionary *ini)
