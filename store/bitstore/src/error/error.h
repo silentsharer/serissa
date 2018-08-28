@@ -20,5 +20,7 @@
 #define BITSTORE_ERR_THREAD_COND_WAIT               -1001008        // cond wait failed
 #define BITSTORE_ERR_THREAD_COND_SIGNAL             -1001009        // cond signal failed
 #define BITSTORE_ERR_THREAD_COND_BROADCAST          -1001010        // cond broadcast failed
+#define BITSTORE_ERR_AIO_CONTEXT_LIST_FULL          -1002000        // aio context list full
+#define BITSTORE_ERR_AIO_EIO                        -1002001        // aio eio
 
 #endif // BITSTORE_ERROR_H
