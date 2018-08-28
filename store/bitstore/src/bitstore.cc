@@ -1,11 +1,27 @@
-#include <error/error.h>
-#include "core/config.h"
 #include <glog/logging.h>
 #include <csignal>
 
-DEFINE_string(conf, "../../conf/bitstore.conf", "program configure file");
+#include <error/error.h>
+#include "core/config.h"
 
-int init(bitstore_context_t *ctx) {
+DEFINE_string(conf, "../../conf/bitstore.conf", "program configure file");
+int init(bitstore_context_t *ctx);
+
+int main(int argc, char **argv)
+{
+    int ret = 0;
+    bitstore_context_t ctx = {argc:argc, argv:argv};
+
+    // init
+    if ((ret = init(&ctx)) != BITSTORE_OK) {
+        return ret;
+    }
+
+    return BITSTORE_OK;
+}
+
+int init(bitstore_context_t *ctx)
+{
     int ret = 0;
     sigset_t signal_mask;
 
@@ -40,19 +56,6 @@ int init(bitstore_context_t *ctx) {
         return BITSTORE_ERR_SIGNAL_INIT;
     }
     LOG(INFO) << "configure, glog, semaphore init success!";
-
-    return BITSTORE_OK;
-}
-
-int main(int argc, char **argv)
-{
-    int ret = 0;
-    bitstore_context_t ctx = {argc:argc, argv:argv};
-
-    // init
-    if ((ret = init(&ctx)) != BITSTORE_OK) {
-        return ret;
-    }
 
     return BITSTORE_OK;
 }

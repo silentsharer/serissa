@@ -6,6 +6,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC")
 add_definitions("-Wall -g")
 
 add_subdirectory(core)
+add_subdirectory(aio)
 
 # Building server
 add_executable(bitstore
@@ -16,4 +17,5 @@ add_executable(bitstore
 target_link_libraries(bitstore
         glog
         core
+        aio
 )

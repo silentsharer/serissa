@@ -3,9 +3,12 @@
 
 #define BITSTORE_OK                                 0               // success
 #define BITSTORE_ERR_FILE_LOAD                      -1000000        // load configure file failed
-#define BITSTORE_ERR_PARAMETER                      -1000001        // parameter error
-#define BITSTORE_ERR_SIGNAL_INIT                    -1000002        // signal init failed
-#define BITSTORE_ERR_MALLOC                         -1000003        // malloc failed
+#define BITSTORE_ERR_FILE_OPEN                      -1000001        // open file failed
+#define BITSTORE_ERR_FILE_STAT                      -1000002        // stat file failed
+#define BITSTORE_ERR_PARAMETER                      -1000003        // parameter error
+#define BITSTORE_ERR_SIGNAL_INIT                    -1000004        // signal init failed
+#define BITSTORE_ERR_MALLOC                         -1000005        // malloc failed
+#define BITSTORE_ERR_BLOCK_INIT_NOIO                -1000006        // no io to init block
 #define BITSTORE_ERR_THREAD_INIT                    -1001000        // thread init failed
 #define BITSTORE_ERR_THREAD_CREATE                  -1001001        // thread create failed
 #define BITSTORE_ERR_THREAD_MUTEX_INIT              -1001002        // mutex init failed

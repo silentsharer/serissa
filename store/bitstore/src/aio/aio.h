@@ -2,7 +2,6 @@
 #define BITSTORE_AIO_H
 
 #include <libaio.h>
-#include <cstdint>
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,6 +22,18 @@ typedef struct {
     int max_iodepth;
     io_context_t ioctx;
 }aio_queue_t;
+
+// single aio operation
+void aio_set(aio_t *aio, int fd);
+void aio_pread(aio_t *aio, uint64_t offset, uint64_t length);
+void aio_pwrite(aio_t *aio, uint64_t offset, uint64_t length);
+long aio_return_value(aio_t *aio);
+
+// aio queue operaion
+int aio_queue_init(aio_queue_t *aio_queue, int max_iodepth);
+int aio_queue_submit(aio_queue_t *aio_queue, struct iocb **piocb, int size);
+int aio_queue_getevents(aio_queue_t *aio_queue, aio_t **paio, int timeout, int max);
+void aio_queue_destroy(aio_queue_t *aio_queue);
 
 #ifdef __cplusplus
 }
