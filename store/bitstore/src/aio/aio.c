@@ -34,7 +34,7 @@ void aio_pwrite(aio_t *aio, uint64_t offset, uint64_t length)
     aio->offset = offset;
     aio->length = length;
 
-    io_prep_pread(&aio->iocb, aio->fd, aio->buf, (size_t)aio->length, aio->offset);
+    io_prep_pwrite(&aio->iocb, aio->fd, aio->buf, (size_t)aio->length, aio->offset);
 }
 
 long aio_return_value(aio_t *aio)
@@ -74,7 +74,7 @@ int aio_queue_submit(aio_queue_t *aio_queue, struct iocb **piocb, int size)
                 delay *= 2;
                 continue;
             }
-            return done;
+            return ret;
         }
         done += ret;
         left -= ret;
