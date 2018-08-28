@@ -3,6 +3,7 @@
 
 #include <error/error.h>
 #include "core/config.h"
+#include "aio/blockdevice.h"
 
 DEFINE_string(conf, "../../conf/bitstore.conf", "program configure file");
 int init(bitstore_context_t *ctx);
