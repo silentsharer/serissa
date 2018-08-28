@@ -19,6 +19,11 @@ typedef struct {
     struct iocb iocb;
 }aio_t;
 
+typedef struct {
+    int max_iodepth;
+    io_context_t ioctx;
+}aio_queue_t;
+
 #ifdef __cplusplus
 }
 #endif
