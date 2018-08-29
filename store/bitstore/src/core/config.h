@@ -11,6 +11,7 @@ extern "C" {
 #define DEFAULT_SERVER_ADDR                 ("0.0.0.0:8080")
 #define DEFAULT_AIO_MAX_QUEUE_DEPTH         1024
 #define DEFAULT_AIO_TIMEOUT                 60
+#define DEFAULT_AIO_REAP_MAX                16
 #define DEFAULT_LOG_DIR                     ("/home/xiaoju/bitstore/log")
 #define DEFAULT_LOG_SIZE                    INT_LEN_1024
 #define DEFAULT_LOG_FLUSH_INTERVAL          0
