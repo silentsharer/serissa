@@ -1,4 +1,6 @@
 #include <sys/stat.h>
+#include <core/config.h>
+#include <errno.h>
 
 #include "blockdevice.h"
 #include "error/error.h"
@@ -31,6 +33,36 @@ void block_device_aio_stop(block_device_t *block_device)
 
 void block_device_aio_thread(void *arg)
 {
+    int ret = 0;
+    block_device_t *block_device = (block_device_t*) arg;
+    int timeout = block_device->bctx->config.aio.timeout;
+    int max = block_device->bctx->config.aio.aio_reap_max;
+
+    aio_t **paio = (aio_t**)malloc(sizeof(aio_t*) * max);
+    if (paio == NULL) {
+        return;
+    }
+
+    while (!block_device->aio) {
+        ret = aio_queue_getevents(&block_device->aio_queue, paio, timeout, max);
+        if (ret < 0) {
+            continue;
+        }
+
+        for (int i = 0; i < ret; i++) {
+            aio_context_t *aioctx = (aio_context_t*)paio[i]->priv;
+            long r = aio_return_value(paio[i]);
+            if (r < 0) {
+                aioctx->rval = -EIO;
+            } else if (paio[i]->length != r) {
+            }
+
+            aio_context_try_wake(aioctx);
+        }
+    }
+
+    free(paio);
+    paio = NULL;
 }
 
 int block_device_open(block_device_t *block_device, const char *path)

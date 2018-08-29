@@ -22,6 +22,7 @@ typedef struct {
 typedef struct {
     int max_queue_depth;
     int timeout;
+    int aio_reap_max;
 }libaio_t;
 
 typedef struct {

@@ -12,6 +12,7 @@ extern "C" {
 typedef struct {
     int fd;
     long rval;
+    void *priv;
     void *buf;
     uint64_t offset;
     uint64_t length;

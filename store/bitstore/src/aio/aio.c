@@ -12,6 +12,7 @@ void aio_set(aio_t *aio, int fd)
     aio->offset = 0;
     aio->length = 0;
     aio->rval = -1000;
+    aio->priv = NULL;
     aio->buf = NULL;
 }
 
