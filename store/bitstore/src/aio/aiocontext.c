@@ -37,6 +37,7 @@ int aio_context_add(aio_context_t *aioctx, int fd, void *data)
 
     ++aioctx->num_pending;
     aioctx->aios[aioctx->num_pending].fd = fd;
+    aioctx->aios[aioctx->num_pending].priv = aioctx;
     aioctx->aios[aioctx->num_pending].buf = data;
 
     return BITSTORE_OK;
@@ -47,9 +48,12 @@ void aio_context_wait(aio_context_t *aioctx)
     thread_cond_wait(&aioctx->cond);
 }
 
-void aio_context_wake(aio_context_t *aioctx)
+void aio_context_try_wake(aio_context_t *aioctx)
 {
-    thread_cond_signal(&aioctx->cond);
+    if (aioctx->num_running == aioctx->num_pending) {
+        thread_cond_signal(&aioctx->cond);
+    }
+    aioctx->num_running++;
 }
 
 int aio_context_return_value(aio_context_t *aioctx)
