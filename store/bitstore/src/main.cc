@@ -3,9 +3,10 @@
 
 #include <error/error.h>
 #include "core/config.h"
-#include "aio/blockdevice.h"
+#include "server/bitstore.h"
 
 DEFINE_string(conf, "../../conf/bitstore.conf", "program configure file");
+
 int init(bitstore_context_t *ctx);
 
 int main(int argc, char **argv)
@@ -17,6 +18,9 @@ int main(int argc, char **argv)
     if ((ret = init(&ctx)) != BITSTORE_OK) {
         return ret;
     }
+
+    BitStore *service = new BitStore(&ctx);
+    service->Run();
 
     return BITSTORE_OK;
 }

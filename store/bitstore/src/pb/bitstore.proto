@@ -5,7 +5,7 @@ package bitstore;
 // The bitstore server definition.
 service BitStore {
     rpc Put(stream PutRequest) returns (PutResponse) {}
-    rpc Get(stream GetRequest) returns (stream GetResponse) {}
+    rpc Get(stream GetRequest) returns (stream GetResponse2) {}
 }
 
 // put object
@@ -25,7 +25,7 @@ message GetRequest {
     uint64 length = 2;
 }
 
-message GetResponse {
+message GetResponse2 {
     sint32 errcode = 1;
     bytes data = 2;
 }

@@ -13,3 +13,4 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 # generate target
 add_subdirectory(src)
 add_subdirectory(third_party/glog)
+add_subdirectory(third_party/grpc)

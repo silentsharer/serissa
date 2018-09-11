@@ -21,3 +21,4 @@ cmake -DBOOST_J=$(nproc) $ARGS "$@" ..
 # make
 make clean
 make -j 8
+make install

@@ -12,6 +12,7 @@ extern "C" {
 #define DEFAULT_AIO_MAX_QUEUE_DEPTH         1024
 #define DEFAULT_AIO_TIMEOUT                 60
 #define DEFAULT_AIO_REAP_MAX                16
+#define DEFAULT_AIO_BLOCK_DEVICE            ("/dev/sdb")
 #define DEFAULT_LOG_DIR                     ("/home/xiaoju/bitstore/log")
 #define DEFAULT_LOG_SIZE                    INT_LEN_1024
 #define DEFAULT_LOG_FLUSH_INTERVAL          0
@@ -21,9 +22,10 @@ typedef struct {
 }server_t;
 
 typedef struct {
-    int max_queue_depth;
-    int timeout;
-    int aio_reap_max;
+    int     max_queue_depth;
+    int     timeout;
+    int     aio_reap_max;
+    char    block_device[INT_LEN_256];
 }libaio_t;
 
 typedef struct {

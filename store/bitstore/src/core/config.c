@@ -27,6 +27,7 @@ void parse_aio(libaio_t *aio, dictionary *ini)
     aio->max_queue_depth = iniparser_getint(ini, "aio:max_queue_depth", DEFAULT_AIO_MAX_QUEUE_DEPTH);
     aio->timeout = iniparser_getint(ini, "aio:timeout", DEFAULT_AIO_TIMEOUT);
     aio->aio_reap_max = iniparser_getint(ini, "aio:aio_reap_max", DEFAULT_AIO_REAP_MAX);
+    snprintf(aio->block_device, sizeof(aio->block_device), iniparser_getstring(ini, "aio:block_device", DEFAULT_AIO_BLOCK_DEVICE));
 }
 
 void parse_log(log_t *log, dictionary *ini)
