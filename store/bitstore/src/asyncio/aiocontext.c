@@ -30,15 +30,15 @@ int aio_context_init(aio_context_t *aioctx)
 
 int aio_context_add(aio_context_t *aioctx, int fd, void *data)
 {
-    assert(aioctx->aios == NULL);
+    assert(aioctx->aios != NULL);
     if (aioctx->num_pending == aioctx->length) {
         return BITSTORE_ERR_AIO_CONTEXT_LIST_FULL;
     }
 
-    ++aioctx->num_pending;
     aioctx->aios[aioctx->num_pending].fd = fd;
     aioctx->aios[aioctx->num_pending].priv = aioctx;
     aioctx->aios[aioctx->num_pending].buf = data;
+    ++aioctx->num_pending;
 
     return BITSTORE_OK;
 }
