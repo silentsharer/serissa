@@ -13,17 +13,19 @@ extern "C" {
 typedef struct {
     bool aio;
     int fd_direct;
+    uint64_t size;
     bool aio_stop;
     char devname[INT_LEN_256];
     pthread_t thread_id;
     aio_queue_t aio_queue;
-    const bitstore_context_t *bctx;
+    bitstore_context_t *bctx;
 }block_device_t;
 
 int block_device_aio_start(block_device_t *block_device);
 void block_device_aio_stop(block_device_t *block_device);
 void block_device_aio_thread(void *arg);
 
+int get_block_device_size(int fd, int64_t *psize);
 int block_device_open(block_device_t *block_device, const char *path);
 int block_device_aio_open(block_device_t *block_device, const char *path);
 int block_device_aio_read(block_device_t *block_device, aio_context_t *aioctx,

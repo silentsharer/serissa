@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <core/config.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 #include "blockdevice.h"
 #include "error/error.h"
@@ -71,13 +72,18 @@ void block_device_aio_thread(void *arg)
 
 int block_device_open(block_device_t *block_device, const char *path)
 {
+    int ret = BITSTORE_OK;
 #ifdef HAVE_LIBAIO
     block_device->aio = true;
-    block_device_aio_open(block_device, path);
-#endif
+    ret = block_device_aio_open(block_device, path);
+    if (ret != BITSTORE_OK) {
+        return ret;
+    }
+#else
     if (!block_device->aio) {
         return BITSTORE_ERR_BLOCK_INIT_NOIO;
     }
+#endif
     return BITSTORE_OK;
 }
 
@@ -85,22 +91,41 @@ int block_device_aio_open(block_device_t *block_device, const char *path)
 {
     int ret = 0;
 
+    // DIO open
     block_device->fd_direct = open(path, O_RDWR|O_DIRECT);
     if (block_device->fd_direct < 0) {
         return BITSTORE_ERR_FILE_OPEN;
     }
 
+    // get file or block size
     struct stat st;
     ret = fstat(block_device->fd_direct, &st);
     if (ret < 0) {
         return BITSTORE_ERR_FILE_STAT;
     }
+    if (S_ISBLK(st.st_mode)) {
+        int64_t s;
+        ret = get_block_device_size(block_device->fd_direct, &s);
+        if (ret != BITSTORE_OK) {
+            return ret;
+        }
+        block_device->size = (uint64_t)s;
+    } else {
+        block_device->size = (uint64_t)st.st_size;
+    }
 
+    // start aio
     ret = block_device_aio_start(block_device);
     if (ret != BITSTORE_OK) {
         return ret;
     }
 
+    return BITSTORE_OK;
+}
+
+int get_block_device_size(int fd, int64_t *psize)
+{
+    *psize = 7 * 1024 * GB;
     return BITSTORE_OK;
 }
 
@@ -131,7 +156,7 @@ int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
         return ret;
     }
 
-    aio_pwrite(&aioctx->aios[aioctx->num_pending], offset, length);
+    aio_pwrite(&aioctx->aios[aioctx->num_pending-1], offset, length);
 
     return BITSTORE_OK;
 }
