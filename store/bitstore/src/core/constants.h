@@ -7,6 +7,7 @@ extern "C" {
 
 #define INT_LEN_256     (1 << 8)
 #define INT_LEN_1024    (1 << 12)
+#define GB              (1024 * 1024 * 1024)
 
 #ifdef __cplusplus
 }
