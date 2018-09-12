@@ -40,7 +40,6 @@ int aio_context_add(aio_context_t *aioctx, int fd, void *data)
     aioctx->aios[aioctx->num_pending].priv = aioctx;
     aioctx->aios[aioctx->num_pending].buf = data;
     ++aioctx->num_pending;
-    logf(LOG_INFO, "aio context add: %p", aioctx->aios[aioctx->num_pending-1].priv);
 
     return BITSTORE_OK;
 }

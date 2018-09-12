@@ -30,6 +30,7 @@ void aio_set(aio_t *aio, int fd);
 void aio_pread(aio_t *aio, uint64_t offset, uint64_t length);
 void aio_pwrite(aio_t *aio, uint64_t offset, uint64_t length);
 long aio_return_value(aio_t *aio);
+void aio_memalign(void **memptr, size_t size);
 
 // asyncio queue operaion
 int aio_queue_init(aio_queue_t *aio_queue, int max_iodepth);

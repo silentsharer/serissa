@@ -11,6 +11,7 @@
 #include "blockdevice.h"
 #include "error/error.h"
 #include "aiocontext.h"
+#include "aio.h"
 
 int block_device_aio_start(block_device_t *block_device)
 {
@@ -60,10 +61,13 @@ void block_device_aio_thread(void *arg)
         for (int i = 0; i < ret; i++) {
             aio_context_t *aioctx = (aio_context_t *)paio[i]->priv;
             long r = aio_return_value(paio[i]);
-//            if (r < 0) {
-//                aioctx->rval = -EIO;
-//            } else if (paio[i]->length != r) {
-//            }
+            if (r < 0) {
+                aioctx->rval = -EIO;
+            } else if (paio[i]->length != r) {
+                aioctx->rval = -EIO;
+            } else {
+                aioctx->rval = r;
+            }
 
             aio_context_try_wake(aioctx);
         }
