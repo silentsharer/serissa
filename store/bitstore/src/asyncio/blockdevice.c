@@ -157,8 +157,12 @@ int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
                            uint64_t offset, uint64_t length, void *data)
 {
     int ret = 0;
+    void *buf = NULL;
 
-    ret = aio_context_add(aioctx, block_device->fd_direct, data);
+    aio_memalign(&buf, length);
+    strncpy(buf, data, length);
+
+    ret = aio_context_add(aioctx, block_device->fd_direct, buf);
     if (ret != BITSTORE_OK) {
         return ret;
     }

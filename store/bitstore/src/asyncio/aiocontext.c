@@ -19,6 +19,7 @@ int aio_context_init(aio_context_t *aioctx)
     if (aioctx->aios == NULL) {
         return BITSTORE_ERR_MALLOC;
     }
+    memset(aioctx->aios, 0, aioctx->length);
 
     ret = thread_cond_init(&aioctx->cond);
     if (ret != BITSTORE_OK) {
@@ -64,8 +65,15 @@ int aio_context_return_value(aio_context_t *aioctx)
 
 void aio_context_destroy(aio_context_t *aioctx)
 {
+    for (int i = 0; i < aioctx->num_pending; i++) {
+        if (aioctx->aios[i].buf != NULL) {
+            free(aioctx->aios[i].buf);
+        }
+    }
     free(aioctx->aios);
     aioctx->aios = NULL;
     aioctx->length = 0;
+    aioctx->num_running = 0;
+    aioctx->num_pending = 0;
     thread_cond_destory(&aioctx->cond);
 }
