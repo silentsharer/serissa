@@ -1,6 +1,7 @@
 #include <glog/logging.h>
 #include <core/config.h>
 #include <bitstore.pb.h>
+#include <asyncio/blockdevice.h>
 #include "bitstore.h"
 #include "error/error.h"
 
@@ -10,6 +11,7 @@ BitStore::BitStore(bitstore_context_t *ctx)
     char errmsg[INT_LEN_256] = {0};
 
     this->bctx = ctx;
+    block_device.bctx = ctx;
     ret = block_device_open(&block_device, bctx->config.aio.block_device);
     if (ret != BITSTORE_OK) {
         snprintf(errmsg, sizeof(errmsg), "block device %s open failed: %d",bctx->config.aio.block_device, ret);
@@ -46,6 +48,8 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
                 LOG(ERROR) << "block asyncio write failed: " << ret;
                 break;
             }
+        } else {
+            break;
         }
     }
 
