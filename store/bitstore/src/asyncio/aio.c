@@ -2,10 +2,11 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
+#include <time.h>
 
 #include "aio.h"
 
-// single aio operation
+// single asyncio operation
 void aio_set(aio_t *aio, int fd)
 {
     aio->fd = fd;
@@ -43,7 +44,7 @@ long aio_return_value(aio_t *aio)
     return aio->rval;
 }
 
-// aio queue operaion
+// asyncio queue operaion
 int aio_queue_init(aio_queue_t *aio_queue, int max_iodepth)
 {
     aio_queue->ioctx = 0;
@@ -91,7 +92,7 @@ int aio_queue_getevents(aio_queue_t *aio_queue, aio_t **paio, int timeout, int m
     struct io_event event[max];
     struct timespec t = {
             timeout / 1000,
-            (timeout % 1000) * 1000 * 1000,
+            (timeout % 1000) * 1000 * 1000
     };
 
     int ret = 0;

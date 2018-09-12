@@ -6,7 +6,7 @@
 #include <bitstore.grpc.pb.h>
 #include <bitstore.pb.h>
 #include "core/config.h"
-#include "aio/blockdevice.h"
+#include "asyncio/blockdevice.h"
 
 class BitStore final : public bitstore::BitStore::Service
 {

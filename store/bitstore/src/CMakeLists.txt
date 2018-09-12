@@ -6,9 +6,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC")
 add_definitions("-Wall -g")
 
 add_subdirectory(core)
-add_subdirectory(aio)
+add_subdirectory(asyncio)
 
-link_directories(core aio)
+link_directories(core asyncio)
 
 set(_PROTOBUF_LIBPROTOBUF libprotobuf)
 set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
@@ -48,8 +48,8 @@ add_executable(bitstore
 # Link lib
 target_link_libraries(bitstore
         core
-        aio
+        asyncio
         ${_GRPC_GRPCPP_UNSECURE}
         ${_PROTOBUF_LIBPROTOBUF}
-        libaio
+        aio
         )

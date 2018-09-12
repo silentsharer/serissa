@@ -7,5 +7,5 @@ set(aio_srcs
 )
 
 add_definitions(-D HAVE_LIBAIO)
-add_library(aio ${aio_srcs})
-target_link_libraries(aio)
+add_library(asyncio ${aio_srcs})
+target_link_libraries(asyncio core)

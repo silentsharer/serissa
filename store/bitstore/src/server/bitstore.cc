@@ -43,7 +43,7 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
                                          req->offset(), req->length(),
                                          (char *)req->data().c_str());
             if (ret != BITSTORE_OK) {
-                LOG(ERROR) << "block aio write failed: " << ret;
+                LOG(ERROR) << "block asyncio write failed: " << ret;
                 break;
             }
         }
@@ -51,14 +51,14 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
 
     ret = block_device_aio_submit(&block_device, &aioctx);
     if (ret != BITSTORE_OK) {
-        LOG(ERROR) << "block aio submit failed: " << ret;
+        LOG(ERROR) << "block asyncio submit failed: " << ret;
     }
 
-    // block wait for aio complete
+    // block wait for asyncio complete
     aio_context_wait(&aioctx);
     ret = aio_context_return_value(&aioctx);
     if (ret < 0) {
-        LOG(ERROR) << "block aio return negative value: " << ret;
+        LOG(ERROR) << "block asyncio return negative value: " << ret;
     }
     aio_context_destroy(&aioctx);
     // TODO:优雅的释放new分配的内存
@@ -87,15 +87,15 @@ grpc::Status BitStore::Get(grpc::ServerContext *context, grpc::ServerReaderWrite
         void *data = NULL;
         ret = block_device_aio_read(&block_device, &aioctx, req.offset(), req.length(), &data);
         if (ret != BITSTORE_OK) {
-            LOG(ERROR) << "block aio read failed: " << ret;
+            LOG(ERROR) << "block asyncio read failed: " << ret;
             break;
         }
 
-        // block wait for aio complete
+        // block wait for asyncio complete
         aio_context_wait(&aioctx);
         ret = aio_context_return_value(&aioctx);
         if (ret < 0) {
-            LOG(ERROR) << "block aio return negative value: " << ret;
+            LOG(ERROR) << "block asyncio return negative value: " << ret;
         }
 
         resp.set_errcode(ret);

@@ -1,4 +1,8 @@
+#define _GNU_SOURCE
+
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <core/config.h>
 #include <errno.h>
 
