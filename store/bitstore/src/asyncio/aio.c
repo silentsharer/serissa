@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 199309L
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>

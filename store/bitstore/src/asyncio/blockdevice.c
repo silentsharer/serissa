@@ -85,7 +85,7 @@ int block_device_aio_open(block_device_t *block_device, const char *path)
 {
     int ret = 0;
 
-    block_device->fd_direct = open(path, O_RDWR|O_DIRECTORY);
+    block_device->fd_direct = open(path, O_RDWR|O_DIRECT);
     if (block_device->fd_direct < 0) {
         return BITSTORE_ERR_FILE_OPEN;
     }
