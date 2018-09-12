@@ -48,7 +48,7 @@ void block_device_aio_thread(void *arg)
         return;
     }
 
-    while (!block_device->aio) {
+    while (block_device->aio) {
         ret = aio_queue_getevents(&block_device->aio_queue, paio, timeout, max);
         if (ret < 0) {
             continue;
