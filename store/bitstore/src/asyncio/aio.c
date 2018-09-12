@@ -29,7 +29,7 @@ void aio_pread(aio_t *aio, uint64_t offset, uint64_t length)
     aio->offset = offset;
     aio->length = length;
 
-    aio_memalign(&aio->buf, (size_t)BUF_SIZE);
+    aio_memalign(&aio->buf, (size_t)aio->length);
     io_prep_pread(&aio->iocb, aio->fd, aio->buf, (size_t)aio->length, aio->offset);
 }
 

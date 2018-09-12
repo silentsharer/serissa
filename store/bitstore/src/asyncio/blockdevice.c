@@ -142,13 +142,13 @@ int block_device_aio_read(block_device_t *block_device, aio_context_t *aioctx,
 {
     int ret = 0;
 
-    ret = aio_context_add(aioctx, block_device->fd_direct, data);
+    ret = aio_context_add(aioctx, block_device->fd_direct, *data);
     if (ret != BITSTORE_OK) {
         return ret;
     }
 
-    aio_pread(&aioctx->aios[aioctx->num_pending], offset, length);
-    *data = aioctx->aios[aioctx->num_pending].buf;
+    aio_pread(&aioctx->aios[aioctx->num_pending-1], offset, length);
+    *data = aioctx->aios[aioctx->num_pending-1].buf;
 
     return BITSTORE_OK;
 }
