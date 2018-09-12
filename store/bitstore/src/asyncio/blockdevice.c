@@ -7,8 +7,10 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
+#include "core/log.h"
 #include "blockdevice.h"
 #include "error/error.h"
+#include "aiocontext.h"
 
 int block_device_aio_start(block_device_t *block_device)
 {
@@ -43,10 +45,11 @@ void block_device_aio_thread(void *arg)
     int timeout = block_device->bctx->config.aio.timeout;
     int max = block_device->bctx->config.aio.aio_reap_max;
 
-    aio_t **paio = (aio_t**)malloc(sizeof(aio_t*) * max);
+    aio_t **paio = (aio_t **)malloc(sizeof(aio_t*) * max);
     if (paio == NULL) {
         return;
     }
+    logf(LOG_INFO, "block aio thread start, timeout: %d, max: %d", timeout, max);
 
     while (block_device->aio) {
         ret = aio_queue_getevents(&block_device->aio_queue, paio, timeout, max);
@@ -55,12 +58,12 @@ void block_device_aio_thread(void *arg)
         }
 
         for (int i = 0; i < ret; i++) {
-            aio_context_t *aioctx = (aio_context_t*)paio[i]->priv;
+            aio_context_t *aioctx = (aio_context_t *)paio[i]->priv;
             long r = aio_return_value(paio[i]);
-            if (r < 0) {
-                aioctx->rval = -EIO;
-            } else if (paio[i]->length != r) {
-            }
+//            if (r < 0) {
+//                aioctx->rval = -EIO;
+//            } else if (paio[i]->length != r) {
+//            }
 
             aio_context_try_wake(aioctx);
         }

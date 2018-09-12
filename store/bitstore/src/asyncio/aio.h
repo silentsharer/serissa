@@ -11,13 +11,13 @@ extern "C" {
 #define BUF_SIZE  4 * 1024 * 1024
 
 typedef struct {
+    struct iocb iocb; // must be first element; see shenanigans in aio_queue_t
+    void *priv;
     int fd;
     long rval;
-    void *priv;
     void *buf;
     uint64_t offset;
     uint64_t length;
-    struct iocb iocb;
 }aio_t;
 
 typedef struct {

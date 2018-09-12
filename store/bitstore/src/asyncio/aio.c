@@ -89,12 +89,12 @@ int aio_queue_submit(aio_queue_t *aio_queue, struct iocb **piocb, int size)
     return done;
 }
 
-int aio_queue_getevents(aio_queue_t *aio_queue, aio_t **paio, int timeout, int max)
+int aio_queue_getevents(aio_queue_t *aio_queue, aio_t **paio, int timeout_ms, int max)
 {
     struct io_event event[max];
     struct timespec t = {
-            timeout / 1000,
-            (timeout % 1000) * 1000 * 1000
+            timeout_ms / 1000,
+            (timeout_ms % 1000) * 1000 * 1000
     };
 
     int ret = 0;
@@ -103,7 +103,7 @@ int aio_queue_getevents(aio_queue_t *aio_queue, aio_t **paio, int timeout, int m
     } while(ret == -EINTR);
 
     for (int i = 0; i < ret; i++) {
-        paio[i] = (aio_t*)event[i].obj;
+        paio[i] = (aio_t *)event[i].obj;
         paio[i]->rval = event[i].res;
     }
 

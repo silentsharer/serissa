@@ -4,6 +4,7 @@
 #include "aio.h"
 #include "aiocontext.h"
 #include "error/error.h"
+#include "core/log.h"
 
 int aio_context_init(aio_context_t *aioctx)
 {
@@ -39,6 +40,7 @@ int aio_context_add(aio_context_t *aioctx, int fd, void *data)
     aioctx->aios[aioctx->num_pending].priv = aioctx;
     aioctx->aios[aioctx->num_pending].buf = data;
     ++aioctx->num_pending;
+    logf(LOG_INFO, "aio context add: %p", aioctx->aios[aioctx->num_pending-1].priv);
 
     return BITSTORE_OK;
 }
@@ -50,10 +52,10 @@ void aio_context_wait(aio_context_t *aioctx)
 
 void aio_context_try_wake(aio_context_t *aioctx)
 {
+    aioctx->num_running++;
     if (aioctx->num_running == aioctx->num_pending) {
         thread_cond_signal(&aioctx->cond);
     }
-    aioctx->num_running++;
 }
 
 int aio_context_return_value(aio_context_t *aioctx)
