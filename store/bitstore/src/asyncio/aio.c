@@ -7,6 +7,7 @@
 #include <time.h>
 
 #include "aio.h"
+#include "core/log.h"
 
 // single asyncio operation
 void aio_set(aio_t *aio, int fd)

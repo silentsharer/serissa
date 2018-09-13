@@ -2,6 +2,8 @@
 #include <core/config.h>
 #include <bitstore.pb.h>
 #include <asyncio/blockdevice.h>
+#include <asyncio/aio.h>
+#include <asyncio/aiocontext.h>
 #include "bitstore.h"
 #include "error/error.h"
 
@@ -81,6 +83,8 @@ grpc::Status BitStore::Get(grpc::ServerContext *context, grpc::ServerReaderWrite
     aio_context_t aioctx = {0};
     bitstore::GetRequest req;
     bitstore::GetResponse2 resp;
+    void *ppdata[100] = {0};
+    int count = 0;
 
     ret = aio_context_init(&aioctx);
     if (ret != BITSTORE_OK) {
@@ -88,27 +92,32 @@ grpc::Status BitStore::Get(grpc::ServerContext *context, grpc::ServerReaderWrite
     }
 
     while (stream->Read(&req)) {
-        void *data = NULL;
-        ret = block_device_aio_read(&block_device, &aioctx, req.offset(), req.length(), &data);
+        ret = block_device_aio_read(&block_device, &aioctx, req.offset(), req.length(), &ppdata[count++]);
         if (ret != BITSTORE_OK) {
             LOG(ERROR) << "block asyncio read failed: " << ret;
-            break;
+            resp.set_errcode(ret);
+            goto Exit;
         }
-
-        // block wait for asyncio complete
-        aio_context_wait(&aioctx);
-        ret = aio_context_return_value(&aioctx);
-        if (ret < 0) {
-            LOG(ERROR) << "block asyncio return negative value: " << ret;
-        }
-
-        resp.set_errcode(ret);
-        resp.set_data((char*)data);
-
-        stream->Write(resp);
-        free(data);
     }
 
+    ret = block_device_aio_submit(&block_device, &aioctx);
+    if (ret != BITSTORE_OK) {
+        LOG(ERROR) << "block asyncio submit failed: " << ret;
+    }
+    // block wait for asyncio complete
+    aio_context_wait(&aioctx);
+    ret = aio_context_return_value(&aioctx);
+    if (ret < 0) {
+        LOG(ERROR) << "block asyncio return negative value: " << ret;
+    }
+
+    resp.set_errcode(0);
+    for (int i = 0; i < count; i++) {
+        resp.set_data((char *)ppdata[i]);
+        stream->Write(resp);
+    }
+
+Exit:
     aio_context_destroy(&aioctx);
     return grpc::Status::OK;
 }
