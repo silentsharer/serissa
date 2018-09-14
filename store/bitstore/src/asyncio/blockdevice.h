@@ -33,6 +33,7 @@ int block_device_aio_read(block_device_t *block_device, aio_context_t *aioctx,
 int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
                            uint64_t offset, uint64_t length, void *data);
 int block_device_aio_submit(block_device_t *block_device, aio_context_t *aioctx);
+int block_device_aio_fsync(block_device_t *block_device, aio_context_t *aioctx);
 
 #ifdef __cplusplus
 }

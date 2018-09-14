@@ -30,6 +30,7 @@ void aio_pread(aio_t *aio, uint64_t offset, uint64_t length)
     aio->offset = offset;
     aio->length = length;
 
+    // TODO: 释放memalign分配的内存
     aio_memalign(&aio->buf, (size_t)aio->length);
     io_prep_pread(&aio->iocb, aio->fd, aio->buf, (size_t)aio->length, aio->offset);
 }
@@ -40,6 +41,11 @@ void aio_pwrite(aio_t *aio, uint64_t offset, uint64_t length)
     aio->length = length;
 
     io_prep_pwrite(&aio->iocb, aio->fd, aio->buf, (size_t)aio->length, aio->offset);
+}
+
+void aio_fsync(aio_t *aio)
+{
+    io_prep_fsync(&aio->iocb, aio->fd);
 }
 
 long aio_return_value(aio_t *aio)

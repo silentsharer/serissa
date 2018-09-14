@@ -65,11 +65,6 @@ int aio_context_return_value(aio_context_t *aioctx)
 
 void aio_context_destroy(aio_context_t *aioctx)
 {
-    for (int i = 0; i < aioctx->num_pending; i++) {
-        if (aioctx->aios[i].buf != NULL) {
-            free(aioctx->aios[i].buf);
-        }
-    }
     free(aioctx->aios);
     aioctx->aios = NULL;
     aioctx->length = 0;

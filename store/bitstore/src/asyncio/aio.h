@@ -29,6 +29,7 @@ typedef struct {
 void aio_set(aio_t *aio, int fd);
 void aio_pread(aio_t *aio, uint64_t offset, uint64_t length);
 void aio_pwrite(aio_t *aio, uint64_t offset, uint64_t length);
+void aio_fsync(aio_t *aio);
 long aio_return_value(aio_t *aio);
 void aio_memalign(void **memptr, size_t size);
 

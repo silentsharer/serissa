@@ -6,6 +6,7 @@
 #include <core/config.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 
 #include "core/log.h"
 #include "blockdevice.h"
@@ -159,6 +160,8 @@ int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
     int ret = 0;
     void *buf = NULL;
 
+    // TODO: 使用GRPC分配的内存，避免内存拷贝
+    // TODO: 释放memalign分配的内存
     aio_memalign(&buf, length);
     strncpy(buf, data, length);
 
@@ -168,6 +171,30 @@ int block_device_aio_write(block_device_t *block_device, aio_context_t *aioctx,
     }
 
     aio_pwrite(&aioctx->aios[aioctx->num_pending-1], offset, length);
+
+    return BITSTORE_OK;
+}
+
+int block_device_aio_fsync(block_device_t *block_device, aio_context_t *aioctx)
+{
+    int ret = BITSTORE_OK;
+
+    aioctx->num_running = 0;
+    for (int i = 0; i < aioctx->num_pending; i++) {
+        aio_fsync(&aioctx->aios[i]);
+    }
+
+    ret = block_device_aio_submit(block_device, aioctx);
+    if (ret < 0) {
+        return ret;
+    }
+
+    aio_context_wait(&aioctx);
+
+    ret = aio_context_return_value(&aioctx);
+    if (ret < 0) {
+        return ret;
+    }
 
     return BITSTORE_OK;
 }
