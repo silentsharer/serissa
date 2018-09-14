@@ -4,6 +4,7 @@
 #include <asyncio/blockdevice.h>
 #include <asyncio/aio.h>
 #include <asyncio/aiocontext.h>
+#include <sys/time.h>
 #include "bitstore.h"
 #include "error/error.h"
 
@@ -32,20 +33,34 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
     int ret = BITSTORE_OK, count = 0;
     aio_context_t aioctx = {0};
     bitstore::PutRequest* reqs[100] = {0};
+    struct timeval tv;
+    uint64_t start_time = 0;
+
+    gettimeofday(&tv,NULL);
+    start_time = tv.tv_sec*1000000 + tv.tv_usec;
+    std::cout << "entry put: " << start_time << std::endl;
 
     ret = aio_context_init(&aioctx);
     if (ret != BITSTORE_OK) {
         goto RESPONSE;
     }
 
+    gettimeofday(&tv,NULL);
+    std::cout << "aio context init: " << tv.tv_sec*1000000 + tv.tv_usec - start_time << std::endl;
+
+    // TODO: 并发的接受和写入
     while (1) {
         bitstore::PutRequest *req = new bitstore::PutRequest;
         reqs[count++] = req;
 
         if (reader->Read(req)) {
+            gettimeofday(&tv,NULL);
+            std::cout << "grpc read: " << tv.tv_sec*1000000 + tv.tv_usec - start_time << std::endl;
             ret = block_device_aio_write(&block_device, &aioctx,
                                          req->offset(), req->length(),
                                          (char *)req->data().c_str());
+            gettimeofday(&tv,NULL);
+            std::cout << "aio write: " << tv.tv_sec*1000000 + tv.tv_usec - start_time << std::endl;
             if (ret != BITSTORE_OK) {
                 LOG(ERROR) << "block asyncio write failed: " << ret;
                 break;
@@ -55,6 +70,9 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
         }
     }
 
+    gettimeofday(&tv,NULL);
+    std::cout << "aio write end: " << tv.tv_sec*1000000 + tv.tv_usec - start_time << std::endl;
+
     ret = block_device_aio_submit(&block_device, &aioctx);
     if (ret != BITSTORE_OK) {
         LOG(ERROR) << "block asyncio submit failed: " << ret;
@@ -62,6 +80,13 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
 
     // block wait for asyncio complete
     aio_context_wait(&aioctx);
+
+    gettimeofday(&tv,NULL);
+    std::cout << "aio wait: " << tv.tv_sec*1000000 + tv.tv_usec - start_time << std::endl;
+
+    // sync data to disk
+    fsync(block_device.fd_direct);
+
     ret = aio_context_return_value(&aioctx);
     if (ret < 0) {
         LOG(ERROR) << "block asyncio return negative value: " << ret;
@@ -71,6 +96,9 @@ grpc::Status BitStore::Put(grpc::ServerContext *context, grpc::ServerReader<bits
     for (int i = 0; i < count; i++) {
         delete reqs[i];
     }
+
+    gettimeofday(&tv,NULL);
+    std::cout << "exit: " << tv.tv_sec*1000000 + tv.tv_usec - start_time << std::endl;
 
     RESPONSE:
     response->set_errcode(ret);
@@ -86,6 +114,8 @@ grpc::Status BitStore::Get(grpc::ServerContext *context, grpc::ServerReaderWrite
     void *ppdata[100] = {0};
     int count = 0;
 
+    // TODO: 释放read memalign分配的内存
+    // TODO: 并发的下载和传输
     ret = aio_context_init(&aioctx);
     if (ret != BITSTORE_OK) {
         return grpc::Status::OK;
